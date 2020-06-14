@@ -18,12 +18,12 @@ font = cv2.FONT_HERSHEY_SIMPLEX
 # Get path to the current working directory
 CWD_PATH = os.getcwd()
 ##############################################
-class RoadSignDetection(Screen):
+class RoadSignDetection():
 
-    def __init__(self, **kw):
-        super(RoadSignDetection, self).__init__(**kw)
+    def __init__(self):
+        pass
 
-    def on_enter(self):  # Будет вызвана в   момент открытия экрана
+    def detect(self):  # Будет вызвана в   момент открытия экрана
         ######## START - MAIN FUNCTION #################################################
 
         # IMPORT THE TRANNIED MODEL
@@ -155,17 +155,19 @@ class RoadSignDetection(Screen):
                 sign_count += 1
                 coordinates.append(position)
 
-            cv2.imshow('Result', image)
+            cv2.imshow('DetectingRoadSign', image)
             count = count + 1
             # Write to video
 
-            if cv2.waitKey(1) & 0xFF == ord('q'):
+            if cv2.waitKey(1) == 13:
+                # Cleanup
+                vidcap.release()
+                cv2.destroyAllWindows()
                 break
-        return
 
     def readVideo(self):
         # Read input video from current working directory
-        inpImage = cv2.VideoCapture(os.path.join(CWD_PATH, 'RoadSignDetect\RoadSigns.mp4'))
+        inpImage = cv2.VideoCapture(os.path.join(CWD_PATH, 'RoadSignDetect\MVI_1049.avi'))
         return inpImage
 
     def getCalssName(self, classNo):
@@ -368,7 +370,7 @@ class RoadSignDetection(Screen):
             img = cv2.equalizeHist(img)
             img = img / 255
 
-            cv2.imshow('SIGN', img)
+            #cv2.imshow('SIGN', img)
             img = img.reshape(1, 32, 32, 1)
 
             predictions = model.predict(img)
