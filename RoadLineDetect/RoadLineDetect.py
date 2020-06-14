@@ -1,12 +1,7 @@
 import cv2
 import numpy as np
 import os
-
-from cv2.cv2 import VideoCapture
-from scipy import optimize
 from matplotlib import pyplot as plt, cm, colors
-from kivy.uix.screenmanager import ScreenManager, Screen
-from kivy.config import ConfigParser
 
 # Defining variables to hold meter-to-pixel conversion
 ym_per_pix = 30 / 720
@@ -18,12 +13,12 @@ xm_per_pix = 3.7 / 720
 CWD_PATH = os.getcwd()
 
 ######## START - FUNCTIONS TO PERFORM IMAGE PROCESSING #########################
-class RoadLineDetection(Screen):
+class RoadLineDetection():
 
 #### START - FUNCTION TO READ AN INPUT IMAGE ###################################
     def readVideo(self):
         # Read input video from current working directory
-        inpImage = cv2.VideoCapture(os.path.join(CWD_PATH, 'RoadLineDetect\drive.mp4'))
+        self.capture = inpImage = cv2.VideoCapture(os.path.join(CWD_PATH, 'RoadLineDetect\drive.mp4'))
         return inpImage
 
     #### START - FUNCTION TO PROCESS IMAGE #########################################
@@ -311,18 +306,18 @@ class RoadLineDetection(Screen):
 
         return img
 
-    def __init__(self, **kw):
-        super(RoadLineDetection, self).__init__(**kw)
+    def __init__(self):
+        pass
 
-    def on_enter(self):  # Будет вызвана в момент открытия экрана
+    def detect(self):  # Будет вызвана в момент открытия экрана
         ######## START - MAIN FUNCTION #################################################
         # Read the input image
-        self.image = self.readVideo()
+        image = self.readVideo()
 
         ################################################################################
         #### START - LOOP TO PLAY THE INPUT IMAGE ######################################
         while True:
-            _, frame = self.image.read()
+            _, frame = self.capture.read()
             # Apply perspective warping by calling the "perspectiveWarp()" function
             # Then assign it to the variable called (birdView)
             # Provide this function with:
@@ -356,14 +351,9 @@ class RoadLineDetection(Screen):
             cv2.imshow("DetectingRoadLine", finalImg)
             # Wait for the ENTER key to be pressed to stop playback
             if cv2.waitKey(1) == 13:
-                self.on_leave()
+                # Cleanup
+                image.release()
+                cv2.destroyAllWindows()
+                break
 
         #### END - LOOP TO PLAY THE INPUT IMAGE ########################################
-
-        # Cleanup
-        image.release()
-        cv2.destroyAllWindows()
-
-
-    def on_leave(self):  # Будет вызвана в момент закрытия экрана
-        self.layout.clear_widgets()  # очищаем список
