@@ -1,25 +1,14 @@
 # coding:utf-8
 from kivy.app import App
 from kivy.uix.button import Button
-from kivy.uix.togglebutton import ToggleButton
-from kivy.uix.checkbox import CheckBox
 from kivy.uix.label import Label
-from kivy.uix.image import Image
-from kivy.clock import Clock
 from kivy.uix.widget import Widget
-from kivy.graphics.texture import Texture
-from kivy.core.window import Window
-from kivy.metrics import dp
 from kivy.uix.screenmanager import ScreenManager, Screen
 from kivy.config import ConfigParser
-
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.anchorlayout import AnchorLayout
-from kivy.uix.gridlayout import GridLayout
-import cv2
 import os
 import ast
-import time
 from RoadLineDetect import RoadLineDetect
 from RoadSignDetect import RoadSignDetect
 
@@ -29,11 +18,12 @@ class MainScreen(Screen):
 
         ModeRoadButton = Button(text='Детектирование дорожной разметки',
                                 on_press=lambda x:
-                                set_screen('RoadLine'),
+                                detect_line(),
                                 font_size=14);
 
         ModeSignButton = Button(text='Детектирование дорожных знаков',
-                                on_press=lambda x: set_screen('RoadSign'),
+                                on_press=lambda x:
+                                detect_sign(),
                                 font_size = 14);
 
         MainLayout = AnchorLayout()
@@ -45,14 +35,19 @@ class MainScreen(Screen):
         MainLayout.add_widget(ControlLayout)
         self.add_widget(MainLayout)
 
-
 def set_screen(name_screen):
     screenManager.current = name_screen
 
+def detect_sign():
+    sign = RoadSignDetect.RoadSignDetection()
+    sign.detect()
+
+def detect_line():
+    line = RoadLineDetect.RoadLineDetection()
+    line.detect()
+
 screenManager = ScreenManager()
 screenManager.add_widget(MainScreen(name='Main'))
-screenManager.add_widget(RoadLineDetect.RoadLineDetection(name='RoadLine'))
-screenManager.add_widget(RoadSignDetect.RoadSignDetection(name='RoadSign'))
 
 
 class HelpDrivingApp(App):
